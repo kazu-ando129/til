@@ -20,7 +20,7 @@
   - 問題なければ、PRをマージする
 
 - 補足
-  - PRはマージできてしまうので、GitHubだろ、「Draft Pull Request」を行うといい
+  - PRはマージできてしまうので、GitHubで行う場合は「Draft Pull Request」使うといい
 
 - 参考URL
   - https://qiita.com/numa08/items/b676e38e3dbabfd39d18
