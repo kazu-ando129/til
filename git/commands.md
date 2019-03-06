@@ -31,6 +31,7 @@
   - コミットする
   ```
   $ git commit -m <commit message>
+  ```
 
   - pushする
   ```
