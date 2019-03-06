@@ -1,6 +1,12 @@
 # commands
 
 - コマンド
+
+  - リポジトリ作成
+  ```
+  $ git init
+  ```
+
   - クローンする
   ```
   $ git clone <repo>
@@ -24,8 +30,8 @@
 
   - ステージングから削除する
   ```
-  $ git reset
   $ git reset <ファイル>
+  $ git reset
   ```
 
   - コミットする
