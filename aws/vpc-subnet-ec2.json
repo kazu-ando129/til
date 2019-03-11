@@ -1,0 +1,456 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "create hoge servers",
+    "Metadata": {},
+    "Parameters": {
+      "AvailabilityZone": {
+        "Description": "availability zone name",
+        "Type": "String",
+        "Default": "ap-northeast-1a"
+      },
+      "EC2InstanceType": {
+        "Description": "EC2 instance type",
+        "Type": "String",
+        "Default": "t2.micro"
+      },
+      "EC2IAM": {
+        "Description": "EC2 IAM",
+        "Type": "String",
+        "Default": "ami-0eb48a19a8d81e20b"
+      },
+      "EBSSize": {
+        "Description": "EBS size",
+        "Type": "String",
+        "Default": "15"
+      },
+      "Client": {
+        "Description": "client name",
+        "Type": "String",
+        "Default": "hoge"
+      },
+      "System": {
+        "Description": "system name",
+        "Type": "String",
+        "Default": "HogeSystem"
+      }
+    },
+    "Mappings": {},
+    "Conditions": {},
+    "Resources": {
+      "MyVpc": {
+        "Type": "AWS::EC2::VPC",
+        "Properties": {
+          "CidrBlock": "10.0.0.0/16",
+          "EnableDnsSupport": true,
+          "EnableDnsHostnames": true,
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" }
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Production"
+            }
+          ]
+        }
+      },
+      "MySubnet1": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+          "AvailabilityZone": {
+            "Ref": "AvailabilityZone"
+          },
+          "MapPublicIpOnLaunch": true,
+          "VpcId": {
+            "Ref": "MyVpc"
+          },
+          "CidrBlock": "10.0.1.0/24",
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" },
+                    "Production"
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Production"
+            }
+          ]
+        }
+      },
+      "MySubnet2": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+          "AvailabilityZone": {
+            "Ref": "AvailabilityZone"
+          },
+          "MapPublicIpOnLaunch": true,
+          "VpcId": {
+            "Ref": "MyVpc"
+          },
+          "CidrBlock": "10.0.2.0/24",
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" },
+                    "Staging"
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Staging"
+            }
+          ]
+        }
+      },
+      "MyIgw": {
+        "Type": "AWS::EC2::InternetGateway",
+        "Properties": {
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" }
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Production"
+            }
+          ]
+        }
+      },
+      "MyAttachGateway": {
+        "Type": "AWS::EC2::VPCGatewayAttachment",
+        "Properties": {
+          "VpcId": {
+            "Ref": "MyVpc"
+          },
+          "InternetGatewayId": {
+            "Ref": "MyIgw"
+          }
+        }
+      },
+      "MyRouteTable": {
+        "Type": "AWS::EC2::RouteTable",
+        "Properties": {
+          "VpcId": {
+            "Ref": "MyVpc"
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" }
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Production"
+            }
+          ]
+        }
+      },
+      "MyRoute": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+          "RouteTableId": {
+            "Ref": "MyRouteTable"
+          },
+          "DestinationCidrBlock": "0.0.0.0/0",
+          "GatewayId": {
+            "Ref": "MyIgw"
+          }
+        }
+      },
+      "MySubnetAttache1": {
+        "Type": "AWS::EC2::SubnetRouteTableAssociation",
+        "Properties": {
+          "SubnetId": {
+            "Ref": "MySubnet1"
+          },
+          "RouteTableId": {
+            "Ref": "MyRouteTable"
+          }
+        }
+      },
+      "MySubnetAttache2": {
+        "Type": "AWS::EC2::SubnetRouteTableAssociation",
+        "Properties": {
+          "SubnetId": {
+            "Ref": "MySubnet2"
+          },
+          "RouteTableId": {
+            "Ref": "MyRouteTable"
+          }
+        }
+      },
+      "MySecGroupName": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {
+          "GroupDescription": "-",
+          "SecurityGroupIngress": [
+            {
+              "IpProtocol": "tcp",
+              "FromPort": "22",
+              "ToPort": "22",
+              "CidrIp": "0.0.0.0/0"
+            },
+            {
+              "IpProtocol": "tcp",
+              "FromPort": "80",
+              "ToPort": "80",
+              "CidrIp": "0.0.0.0/0"
+            },
+            {
+              "IpProtocol": "tcp",
+              "FromPort": "443",
+              "ToPort": "443",
+              "CidrIp": "0.0.0.0/0"
+            }
+          ],
+          "VpcId": {
+            "Ref": "MyVpc"
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" },
+                    "Production"
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Production"
+            }
+          ]
+        }
+      },
+      "Ec2Instance1": {
+        "Type": "AWS::EC2::Instance",
+        "Properties": {
+          "AvailabilityZone": {
+            "Ref": "AvailabilityZone"
+          },
+          "KeyName": "hoge-key",
+          "ImageId": {
+            "Ref": "EC2IAM"
+          },
+          "InstanceType": {
+            "Ref": "EC2InstanceType"
+          },
+          "DisableApiTermination": true,
+          "Monitoring": false,
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/sda1",
+              "Ebs": {
+                "Encrypted": true,
+                "VolumeSize": { "Ref": "EBSSize" },
+                "VolumeType": "gp2"
+              }
+            }
+          ],
+          "SubnetId": {
+            "Ref": "MySubnet1"
+          },
+          "SecurityGroupIds": [
+            {
+              "Ref": "MySecGroupName"
+            }
+          ],
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" },
+                    "Production"
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Production"
+            }
+          ],
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Join": [
+                "",
+                [
+                  "#!/bin/bash -ex",
+                  "sudo apt-get update",
+                  "sudo apt-get upgrade",
+                  "sudo apt install python"
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "Ec2Instance2": {
+        "Type": "AWS::EC2::Instance",
+        "Properties": {
+          "AvailabilityZone": {
+            "Ref": "AvailabilityZone"
+          },
+          "KeyName": "hoge-key",
+          "ImageId": {
+            "Ref": "EC2IAM"
+          },
+          "InstanceType": {
+            "Ref": "EC2InstanceType"
+          },
+          "DisableApiTermination": true,
+          "Monitoring": false,
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/sda1",
+              "Ebs": {
+                "Encrypted": true,
+                "VolumeSize": { "Ref": "EBSSize" },
+                "VolumeType": "gp2"
+              }
+            }
+          ],
+          "SubnetId": {
+            "Ref": "MySubnet2"
+          },
+          "SecurityGroupIds": [
+            {
+              "Ref": "MySecGroupName"
+            }
+          ],
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    { "Ref": "Client" },
+                    { "Ref": "System" },
+                    "Staging"
+                  ]
+                ]
+              }
+            },
+            {
+              "Key": "Client",
+              "Value": {
+                "Ref": "Client"
+              }
+            },
+            {
+              "Key": "Stack",
+              "Value": "Staging"
+            }
+          ],
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Join": [
+                "",
+                [
+                  "#!/bin/bash -ex",
+                  "sudo apt-get update",
+                  "sudo apt-get upgrade",
+                  "sudo apt install python"
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "Outputs": {}
+  }

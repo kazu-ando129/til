@@ -14,6 +14,8 @@
       - "logicalName"のパラメーター値を返す
     - { "Fn::Join": [ "delimiter", [ "value1", "value2", "value3" ] }
       - "delimiter"で区切りながら、value1〜valur3を結合する
-
+  - サンプル
+    - VPC、subnet、EC2立ち上げ
+      - 「vpc-subnet-ec2.json」参照
 - 参考
   - https://aws.amazon.com/jp/cloudformation/
