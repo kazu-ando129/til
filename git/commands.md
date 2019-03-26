@@ -43,3 +43,13 @@
   ```
   $ git push -u origin master
   ```
+
+  - リモートのURLを確認する
+  ```
+  $ git remote -v
+  ```
+
+  - リモートのURLを設定する
+  ```
+  $ git remote set-url origin <repo>
+  ```
