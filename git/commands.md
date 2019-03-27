@@ -51,5 +51,10 @@
 
   - リモートのURLを設定する
   ```
-  $ git remote set-url origin <repo>
+  $ git remote set-url <name> <repo>
+  ```
+
+  - リモートを削除する
+  ```
+  $ git remote rm <name>
   ```
