@@ -28,3 +28,8 @@
   ```
   $ ssh -T git@github.com
   ```
+  
+  - 以下となれば、設定完了！
+  ```
+  Hi **** You've successfully authenticated, but GitHub does not provide shell access.
+  ```
